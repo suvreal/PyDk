@@ -1,0 +1,47 @@
+    [build-system]
+    requires = ["setuptools>=61.0", "wheel"]
+    build-backend = "setuptools.build_meta"
+
+    [project]
+    name = "pydk-custom"
+    version = "0.1.0"
+    description = "A simple Python SDK for Applifting API communication "
+    authors = [
+        { name = "Suvreal", email = "bartas.elias@gmail.com" }
+    ]
+    readme = "README.md"
+    license = { file = "LICENSE" }
+    requires-python = ">=3.10"
+
+dependencies = [
+    "httpx>=0.23",
+    "pydantic>=2.0",
+    "aiosqlite>=0.19"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.4.1",
+    "pytest-cov>=6.2.1",
+    "pytest-mypy>=1.0.1",
+    "black>=24.0",
+    "ruff>=0.12.4",
+    "mypy>=1.0",
+    "pytest-asyncio>=1.1.0"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = [
+    "src"
+]
+
+[tool.black]
+line-length = 100
+target-version = ['py310']
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
