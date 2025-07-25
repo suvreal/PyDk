@@ -8,7 +8,7 @@ A simple Python SDK for Applifting API communication
 - [Features](#-features)
 - [Installation](#-installation)
 - [Usage](#-usage)
-    - [Package Usage](#-package-usage)
+    - [Package Usage](#package-usage)
     - [Simple Facade Example](#-simple-facade-example)
 - [Development](#-development)
 - [Acknowledgments](#-acknowledgments)
@@ -54,7 +54,8 @@ Check `examples/py_dk_custom_script.py` for implementation:
 
 ```bash
     source venv/bin/activate
-    python -m examples.py_dk_custom_script
+    make dev
+    python3 -m examples.py_dk_custom_script
 ```
 
 Expected output:
@@ -68,22 +69,39 @@ Expected output:
 ### 🧩 Simple Facade Example
 
 ```python
+# Initialize SDK
 sdk = MyApiSDK(
-    bearer="YOUR_BEARER_TOKEN"  # Get token from https://python.exercise.applifting.cz/assignment/sdk/
+  bearer="YOUR_BEARER_TOKEN"  # Get token from https://python.exercise.applifting.cz/assignment/sdk/
 )
 
+# Create new product
 product = Product(
-    id=uuid4(),
-    name="Example Product",
-    description="Example Description"
+  id=uuid4(),
+  name="Example Product",
+  description="Example Description"
 )
 
-register_response = await sdk.product.register_product(product)
-print("Register response:", register_response)
+# Product registration
+response_register = await sdk.register_product(product)
+print("Register response: ")
+print(response_register.id)
+print(response_register.name)
+print(response_register.description)
 
-offer_response = await sdk.offer.get_offer(product)
-print("Offer response:", offer_response)
+# Offer obtaining
+response_offers = await sdk.get_offers(product)
+print("Offer response: ")
+print(response_offers)
 
+# Get filled product Offers
+print("Product Offers: ")
+print(product.offers)
+
+# Product final
+print("Product final: ")
+print(product)
+
+# End client and release resources
 await sdk.aclose()
 ```
 

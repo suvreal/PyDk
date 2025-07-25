@@ -1,7 +1,12 @@
 import time
+from typing import List
+from urllib import response
+
 import pytest
 from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
+
+from black import assert_equivalent
 from httpx import HTTPStatusError, Response, Request
 from pydantic import ValidationError
 
@@ -30,6 +35,9 @@ def fake_cache_client():
 
 @pytest.mark.asyncio
 async def test_product_registration_and_offer(fake_http_client, fake_cache_client):
+    from uuid import uuid4
+    from src.classes.Product import Product
+
     sdk = MyApiSDK(
         bearer="dummy-bearer",
         http_client=fake_http_client,
@@ -42,13 +50,20 @@ async def test_product_registration_and_offer(fake_http_client, fake_cache_clien
         description="Test Description"
     )
 
-    register_response = await sdk.product.register_product(product)
-    assert register_response["status_code"] == 201
-    fake_http_client.post.assert_called()
+    fake_http_client.post = AsyncMock(return_value={
+        "status_code": 201,
+        "data": {
+            "id": str(product.id),
+            "name": product.name,
+            "description": product.description
+        }
+    })
 
-    offer_response = await sdk.offer.get_offer(product)
-    assert offer_response["status_code"] == 200
-    fake_http_client.get.assert_called()
+    register_response = await sdk.product.register_product(product)
+
+    assert register_response.id == product.id
+    assert register_response.name == product.name
+    assert register_response.description == product.description
 
     await sdk.aclose()
     fake_http_client.aclose.assert_called()
@@ -66,8 +81,13 @@ async def test_offer_service_returns_offer_for_product():
         description="To check GET offer"
     )
 
+    fake_offers = [
+        {"id": str(uuid4()), "price": 100.0, "items_in_stock": 10},
+        {"id": str(uuid4()), "price": 200.0, "items_in_stock": 5},
+    ]
+
     mock_http_client = MagicMock()
-    mock_http_client.get = AsyncMock(return_value={"status_code": 200, "data": {"offers": []}})
+    mock_http_client.get = AsyncMock(return_value={"status_code": 200, "data": fake_offers})
     mock_http_client.aclose = AsyncMock()
 
     fake_auth_client = MagicMock(spec=AuthClient)
@@ -79,11 +99,17 @@ async def test_offer_service_returns_offer_for_product():
         http_client=mock_http_client
     )
 
-    response = await service.get_offer(product)
+    offers: List[Offer] = await service.get_offers(product)
 
-    assert response["status_code"] == 200
-    mock_http_client.get.assert_called_once()
-    assert "offers" in response["data"]
+    assert isinstance(offers, list)
+    assert all(isinstance(o, Offer) for o in offers)
+
+    for o in offers:
+        assert isinstance(o.id, type(uuid4()))
+        assert isinstance(o.price, float)
+        assert isinstance(o.items_in_stock, int)
+
+    assert product.offers == offers
 
 
 @pytest.mark.asyncio

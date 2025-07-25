@@ -23,3 +23,7 @@ class HTTPClientInterface(ABC):
         self, url: str, params: dict | None = None, headers: dict | None = None
     ) -> dict:
         raise NotImplementedError("DELETE method must be implemented by subclass.")
+
+    @abstractmethod
+    async def aclose(self) -> None:
+        raise NotImplementedError("ACLOSE method must be implemented by subclass.")

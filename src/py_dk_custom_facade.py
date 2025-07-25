@@ -1,3 +1,9 @@
+from typing import List
+
+from src.classes.Offer import Offer
+
+from src.classes.Product import Product
+
 from src.client.http_client_interface import HTTPClientInterface
 from src.client.http_x_client_adapter import HTTPXClientAdapter
 from src.token_manager.auth_client import AuthClient
@@ -43,9 +49,15 @@ class MyApiSDK:
 
         self.offer = OfferService(api_url + offer_path, self._auth_client, self._http_client)
 
-    async def aclose(self):
+    async def aclose(self) -> None:
         await self._http_client.aclose()
 
         close_method = getattr(self._token_cache_client, "aclose", None)
         if close_method and asyncio.iscoroutinefunction(close_method):
             await close_method()
+
+    async def register_product(self, product) -> Product:
+        return await self.product.register_product(product)
+
+    async def get_offers(self, product) -> List[Offer]:
+        return await self.offer.get_offers(product)

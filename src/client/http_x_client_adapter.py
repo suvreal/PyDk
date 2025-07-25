@@ -64,5 +64,5 @@ class HTTPXClientAdapter(HTTPClientInterface):
         response.raise_for_status()
         return {"status_code": response.status_code, "data": response.json()}
 
-    async def aclose(self):
+    async def aclose(self) -> None:
         await self.client.aclose()

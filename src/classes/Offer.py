@@ -1,5 +1,7 @@
 from uuid import UUID
+from typing import List
 from pydantic import BaseModel, Field
+from collections.abc import Iterable
 
 
 class Offer(BaseModel):
@@ -23,3 +25,21 @@ class Offer(BaseModel):
             price=int(data["price"]),
             items_in_stock=int(data["items_in_stock"]),
         )
+
+    @classmethod
+    def from_response(cls, response: dict) -> List["Offer"]:
+        data = response.get("data")
+        if not isinstance(data, Iterable):
+            raise ValueError("Attribute 'data' is not iterable!")
+
+        offers: List[Offer] = []
+        for offer in data:
+            offers.append(
+                cls(
+                    id=UUID(offer.get("id")),
+                    price=offer.get("price"),
+                    items_in_stock=offer.get("items_in_stock"),
+                )
+            )
+
+        return offers
