@@ -46,7 +46,7 @@ async def test_product_registration_and_offer(fake_http_client, fake_cache_clien
     assert register_response["status_code"] == 201
     fake_http_client.post.assert_called()
 
-    offer_response = await sdk.offer.get_offer(product)
+    offer_response = await sdk.offer.get_offers(product)
     assert offer_response["status_code"] == 200
     fake_http_client.get.assert_called()
 
@@ -79,7 +79,7 @@ async def test_offer_service_returns_offer_for_product():
         http_client=mock_http_client
     )
 
-    response = await service.get_offer(product)
+    response = await service.get_offers(product)
 
     assert response["status_code"] == 200
     mock_http_client.get.assert_called_once()

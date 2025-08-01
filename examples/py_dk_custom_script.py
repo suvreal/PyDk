@@ -5,13 +5,15 @@ from src.py_dk_custom_facade import MyApiSDK
 
 import sys
 import os
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
 
 
 async def main():
     # MyApiSDK init for API - https://python.exercise.applifting.cz/docs#/default/auth_api_v1_auth_post
     sdk = MyApiSDK(
-        bearer="" # get your own from https://python.exercise.applifting.cz/assignment/sdk/
+        bearer="YOUR_BEARER_TOKEN"
+        # get your own from https://python.exercise.applifting.cz/assignment/sdk/
         # optional - set custom api_url - str
         # optional - set custom product_path  - str
         # optional - set custom offer_path  - str
@@ -30,11 +32,23 @@ async def main():
 
     # Product registration
     response_register = await sdk.product.register_product(product)
-    print("Register response:", response_register)
+    print("Register response: ")
+    print(response_register.id)
+    print(response_register.name)
+    print(response_register.description)
+    print("")
 
     # Offer obtaining
-    response_offers = await sdk.offer.get_offer(product)
+    response_offers = await sdk.offer.get_offers(product)
     print("Offer response:", response_offers)
+    print("")
+
+    # Get filled product Offers
+    print("Product Offers:", product.offers)
+    print("")
+
+    # Product final
+    print("Product final:", product)
 
     # End client and release resources
     await sdk.aclose()

@@ -54,7 +54,8 @@ Check `examples/py_dk_custom_script.py` for implementation:
 
 ```bash
     source venv/bin/activate
-    python -m examples.py_dk_custom_script
+    make dev
+    python3 -m examples.py_dk_custom_script
 ```
 
 Expected output:
@@ -69,19 +70,19 @@ Expected output:
 
 ```python
 sdk = MyApiSDK(
-    bearer="YOUR_BEARER_TOKEN"  # Get token from https://python.exercise.applifting.cz/assignment/sdk/
+  bearer="YOUR_BEARER_TOKEN"  # Get token from https://python.exercise.applifting.cz/assignment/sdk/
 )
 
 product = Product(
-    id=uuid4(),
-    name="Example Product",
-    description="Example Description"
+  id=uuid4(),
+  name="Example Product",
+  description="Example Description"
 )
 
 register_response = await sdk.product.register_product(product)
 print("Register response:", register_response)
 
-offer_response = await sdk.offer.get_offer(product)
+offer_response = await sdk.offer.get_offers(product)
 print("Offer response:", offer_response)
 
 await sdk.aclose()
