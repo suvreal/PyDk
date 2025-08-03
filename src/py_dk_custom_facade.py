@@ -4,8 +4,8 @@ from src.classes.Offer import Offer
 
 from src.classes.Product import Product
 
-from src.client.http_client_interface import HTTPClientInterface
-from src.client.http_x_client_adapter import HTTPXClientAdapter
+from src.client.httpx.http_client_interface import HTTPClientInterface
+from src.client.httpx.http_x_client_adapter import HTTPXClientAdapter
 from src.token_manager.auth_client import AuthClient
 from src.endpoint_implementation.register_product import ProductService
 from src.endpoint_implementation.get_offer import OfferService

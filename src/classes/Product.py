@@ -2,6 +2,7 @@ from uuid import UUID
 from typing import List
 from pydantic import BaseModel, Field
 from src.classes.Offer import Offer
+from src.client.httpx.http_client_interface import HTTPResponse
 
 
 class Product(BaseModel):
@@ -17,7 +18,7 @@ class Product(BaseModel):
         self.offers = offers
 
     @classmethod
-    def denormalize(cls, data):
+    def denormalize(cls, data) -> "Product":
         return cls(
             id=UUID(data["id"]),
             name=str(data["name"]),
@@ -26,7 +27,7 @@ class Product(BaseModel):
         )
 
     @classmethod
-    def from_response(cls, response: dict, product: "Product") -> "Product":
+    def from_response(cls, response: HTTPResponse, product: "Product") -> "Product":
         data = response.get("data")
         if data is None:
             raise ValueError("Missing 'data' in response")

@@ -1,5 +1,5 @@
-from src.client.http_client_interface import HTTPClientInterface
-from src.endpoint_implementation.correct_response import CorrectResponse
+from src.client.httpx.http_client_interface import HTTPClientInterface
+from src.utils.correct_response import CorrectResponse
 
 
 class AuthService:
@@ -13,5 +13,8 @@ class AuthService:
             url=self._url, headers={"Bearer": self._bearer_token}
         )
         if CorrectResponse.is_correct(auth_response["status_code"]):
-            return auth_response["data"]["access_token"]
+            access_token = auth_response["data"]["access_token"]
+            if not isinstance(access_token, str):
+                raise ValueError(f"Auth failed - inobtainable access token: {auth_response}")
+            return access_token
         raise ValueError(f"Auth failed: {auth_response}")

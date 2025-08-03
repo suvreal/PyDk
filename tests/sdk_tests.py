@@ -1,7 +1,7 @@
 import time
 from typing import List
-from urllib import response
 
+import httpx
 import pytest
 from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
@@ -13,6 +13,13 @@ from pydantic import ValidationError
 from src.py_dk_custom_facade import MyApiSDK
 from src.classes.Product import Product
 from src.classes.Offer import Offer
+
+from src.client.httpx.http_x_client_adapter import HTTPXClientAdapter
+from src.exceptions.httpx_adapter_client_exceptions import (
+    SDKException,
+    NetworkError,
+    APIError
+)
 
 
 @pytest.fixture
@@ -222,3 +229,61 @@ async def test_cache_fallback_on_api_error():
         await auth_client.provide_token()
 
     mock_http_client.post.assert_called()
+
+
+@pytest.mark.asyncio
+async def test_network_error_timeout(monkeypatch):
+    adapter = HTTPXClientAdapter()
+
+    async def mock_post(*args, **kwargs):
+        raise httpx.TimeoutException("Request timed out")
+
+    monkeypatch.setattr(adapter.client, "post", mock_post)
+
+    with pytest.raises(NetworkError) as excinfo:
+        await adapter.post("https://example.com")
+    assert "timed out" in str(excinfo.value)
+
+
+@pytest.mark.asyncio
+async def test_network_error_request(monkeypatch):
+    adapter = HTTPXClientAdapter()
+
+    async def mock_post(*args, **kwargs):
+        raise httpx.RequestError("Network broken")
+
+    monkeypatch.setattr(adapter.client, "post", mock_post)
+
+    with pytest.raises(NetworkError) as excinfo:
+        await adapter.post("https://example.com")
+    assert "Network broken" in str(excinfo.value)
+
+
+@pytest.mark.asyncio
+async def test_api_error_status(monkeypatch):
+    adapter = HTTPXClientAdapter()
+
+    async def mock_post(*args, **kwargs):
+        raise httpx.HTTPStatusError(
+            "Bad status", request=AsyncMock(), response=AsyncMock(status_code=500, text="Server error")
+        )
+
+    monkeypatch.setattr(adapter.client, "post", mock_post)
+
+    with pytest.raises(APIError) as excinfo:
+        await adapter.post("https://example.com")
+    assert "500" in str(excinfo.value)
+
+
+@pytest.mark.asyncio
+async def test_unexpected_error(monkeypatch):
+    adapter = HTTPXClientAdapter()
+
+    async def mock_post(*args, **kwargs):
+        raise RuntimeError("Unexpected crash")
+
+    monkeypatch.setattr(adapter.client, "post", mock_post)
+
+    with pytest.raises(SDKException) as excinfo:
+        await adapter.post("https://example.com")
+    assert "Unexpected" in str(excinfo.value)

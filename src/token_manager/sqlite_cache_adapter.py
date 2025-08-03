@@ -8,7 +8,7 @@ class SQLiteCacheAdapter(AccessTokenCacheInterface):
         self._db_path = db_path
         self._initialized = False
 
-    async def _init_db(self):
+    async def _init_db(self) -> None:
         if self._initialized:
             return
         async with aiosqlite.connect(self._db_path) as db:

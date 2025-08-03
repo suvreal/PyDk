@@ -1,5 +1,5 @@
 import time
-from src.client.http_client_interface import HTTPClientInterface
+from src.client.httpx.http_client_interface import HTTPClientInterface
 from src.endpoint_implementation.authenticate import AuthService
 from src.token_manager.cache_interface import AccessTokenCacheInterface
 

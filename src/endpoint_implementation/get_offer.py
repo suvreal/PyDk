@@ -2,7 +2,7 @@ from typing import List
 
 from src.classes.Product import Product
 from src.classes.Offer import Offer
-from src.client.http_client_interface import HTTPClientInterface
+from src.client.httpx.http_client_interface import HTTPClientInterface
 from src.token_manager.auth_client import AuthClient
 
 

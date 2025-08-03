@@ -1,5 +1,5 @@
 from src.classes.Product import Product
-from src.client.http_client_interface import HTTPClientInterface
+from src.client.httpx.http_client_interface import HTTPClientInterface
 from src.token_manager.auth_client import AuthClient
 
 
@@ -13,7 +13,9 @@ class ProductService:
         token = await self._auth_client.provide_token()
         product_data = product.normalize()
         response = await self._http_client.post(
-            url=self._url, data=product_data, headers={"Bearer": token}
+            url=self._url,
+            data=product_data,
+            headers={"Bearer": token},
         )
 
         return Product.from_response(response, product)

@@ -3,6 +3,8 @@ from typing import List
 from pydantic import BaseModel, Field
 from collections.abc import Iterable
 
+from src.client.httpx.http_client_interface import HTTPResponse
+
 
 class Offer(BaseModel):
     id: UUID = Field(..., description="Unique identifier for the offer")
@@ -11,7 +13,7 @@ class Offer(BaseModel):
     )
     items_in_stock: int = Field(..., description="Number of items in stock for this offer")
 
-    def normalize(self):
+    def normalize(self) -> dict[str, str | float | int]:
         return {
             "id": str(self.id),
             "price": self.price,
@@ -19,7 +21,7 @@ class Offer(BaseModel):
         }
 
     @classmethod
-    def denormalize(cls, data):
+    def denormalize(cls, data) -> "Offer":
         return cls(
             id=UUID(data["id"]),
             price=int(data["price"]),
@@ -27,7 +29,7 @@ class Offer(BaseModel):
         )
 
     @classmethod
-    def from_response(cls, response: dict) -> List["Offer"]:
+    def from_response(cls, response: HTTPResponse) -> List["Offer"]:
         data = response.get("data")
         if not isinstance(data, Iterable):
             raise ValueError("Attribute 'data' is not iterable!")
